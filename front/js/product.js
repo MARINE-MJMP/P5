@@ -28,7 +28,7 @@ fetch("http://localhost:3000/api/products/" + id)
       product.description);
     console.log(Description);
 
-    //// Boucle forEach pour ajouter toutes les couleurs en option du select en HTML
+    // Boucle forEach pour ajouter toutes les couleurs en option du select en HTML
     product.colors.forEach(function (Colors) {
       const option = document.createElement("option");
       const select = document.getElementById("colors");
@@ -42,3 +42,32 @@ fetch("http://localhost:3000/api/products/" + id)
       console.log(Colors);
     });
   });
+
+const ajoutpanier = () => {
+  console.log("hello");
+  const color = document.getElementById("colors").value;
+  const qty = document.getElementById("quantity").value;
+  console.log(color, qty);
+  // verifier que color et qty ont bien été saisis
+
+  const produit = {
+    id: id,
+    color: color,
+    qty: +qty,
+  };
+
+  console.log(produit);
+  const panier = (localStorage.panier && JSON.parse(localStorage.panier)) || [];
+  const match = panier.find(
+    (product) => product.color === color && product.id === id
+  );
+  console.log(match);
+  if (match) {
+    match.qty += +qty;
+  } else {
+    panier.push(produit);
+    console.log(panier);
+  }
+  localStorage.panier = JSON.stringify(panier);
+};
+addToCart.addEventListener("click", ajoutpanier);
