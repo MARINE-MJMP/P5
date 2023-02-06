@@ -106,92 +106,90 @@ const form = document.querySelector("form");
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
+  let isFormValid = true;
   const firstName = document.getElementById("firstName").value;
   const lastName = document.getElementById("lastName").value;
   const city = document.getElementById("city").value;
-  const adress = document.getElementById("address").value;
+  const address = document.getElementById("address").value;
   const email = document.getElementById("email").value;
   console.log(firstName, lastName, city, address, email);
   console.log(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(firstName));
 
-  if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(firstName) === false) {
-    document.querySelector(".firstNameErrorMsg").innerText =
-      "Ton prénom n'est pas bon";
-  } else {
-    document.querySelector(".firstNameErrorMsg").innerText = "";
-  }
-
   if (/\d/.test(firstName) === true) {
-    // error
+    document.querySelector("#firstNameErrorMsg").innerText =
+      "Ton prénom n'est pas bon";
+    isFormValid = false;
   } else {
-    // vider erreur
+    document.querySelector("#firstNameErrorMsg").innerText = "";
   }
 
-  if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(lastName) === false) {
-    document.querySelector(".lastNameErrorMsg").innerText =
+  if (/\d/.test(lastName) === true) {
+    document.querySelector("#lastNameErrorMsg").innerText =
       "Ton nom n'est pas bon";
+    isFormValid = false;
   } else {
-    document.querySelector(".lastNameErrorMsg").innerText = "";
+    document.querySelector("#lastNameErrorMsg").innerText = "";
   }
 
-  if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(lastName) === true) {
-    // error
-  } else {
-    // vider erreur
-  }
-
-  if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(city) === false) {
-    document.querySelector(".cityErrorMsg").innerText =
+  if (/\d/.test(city) === true) {
+    document.querySelector("#cityErrorMsg").innerText =
       "Ta ville n'est pas valide";
+    isFormValid = false;
   } else {
-    document.querySelector(".cityErrorMsg").innerText = "";
-  }
-
-  if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(city) === true) {
-    // error
-  } else {
-    // vider erreur
+    document.querySelector("#cityErrorMsg").innerText = "";
   }
 
   if (/^[#.0-9a-zA-ZÀ-ÿ\s,-]{2,60}$/.test(address) === false) {
-    document.querySelector("addressErrorMsg").innerText =
+    document.querySelector("#addressErrorMsg").innerText =
       "Ton adresse n'est pas valide";
+    isFormValid = false;
   } else {
-    document.querySelector("addressErrorMsg").innerText = "";
+    document.querySelector("#addressErrorMsg").innerText = "";
   }
 
-  if (/^[#.0-9a-zA-ZÀ-ÿ\s,-]{2,60}$/.test(address) === true) {
-    // error
-  } else {
-    // vider erreur
-  }
-
-  if (
-    /^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})$/.test(
-      email
-    ) === false
-  ) {
-    document.querySelector(".emailErrorMsg").innerText =
+  if (/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email) === false) {
+    document.querySelector("#emailErrorMsg").innerText =
       "Ton emain n'est pas valide";
+    isFormValid = false;
   } else {
-    document.querySelector(".emailErrorMsg").innerText = "";
+    document.querySelector("#emailErrorMsg").innerText = "";
   }
 
-  if (
-    /^[_a-z0-9-]+(.[_a-z0-9-]+)*@[a-z0-9-]+(.[a-z0-9-]+)*(.[a-z]{2,4})$/.test(
-      email
-    ) === true
-  ) {
-    // error
-  } else {
-    // vider erreur
+  if (isFormValid === true) {
+    console.log("Formulaire valide");
+    const contact = {
+      firstName,
+      lastName,
+      email,
+      city,
+      address,
+    };
+
+    const productIds = panier.map((item) => item.id);
+    fetch("http://localhost:3000/api/products/order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contact,
+        products: productIds,
+      }),
+    });
+    //********** PROBLEME AVEC .THEN *************//
+
+    productIds.then(async function (response) {
+      const retour = await response.json();
+      window.location.href = `confirmation.html?orderId=${retour.orderId}`;
+    });
   }
-  // Récupérer toutes les regex
-  // prénom, nom et la ville ==> pas de chiffre
-  // email ==> /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
-  // zipCode / code postal ==> pas de lettre
-
-  // Ajouter les messages d'erreur
-
-  // https://regex101.com/
 });
+
+// Récupérer la réponse du fetch avec un .then etc.
+// Récupérer l'orderId
+// ===> redirection en javascript (window.location.href) vers la page confirmation.html
+// ==> confirmation.html?orderId=
+// créer le fichier confirmation.js
+// récupérer le paramètre GET qu'on vient d'envoyer
+// l'afficher
+// projet terminé
